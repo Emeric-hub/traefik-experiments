@@ -1,0 +1,24 @@
+
+services:
+  default-nginx:
+    # A container that exposes an API to show its IP address
+    image: nginx
+    labels:
+      - traefik.enable=true
+      # Handling non tls
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=HostRegexp(`.*`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=false
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=web
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.priority=1
+      # Handling tls
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-tls.rule=HostRegexp(`.*`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-tls.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-tls.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-tls.priority=1
+    volumes:
+      - ./static:/usr/share/nginx/html
+    networks:
+      - traefik
+networks:
+  traefik:
+    external: true
