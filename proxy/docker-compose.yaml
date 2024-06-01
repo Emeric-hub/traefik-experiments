@@ -5,17 +5,60 @@ services:
     # The official v3 Traefik docker image
     image: traefik:v3.0
     # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
+    command: 
+      - --api.insecure=true
+      - --api.debug=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Activate Logs on stdout
+      - --accesslog=true
+      #- --log.level=DEBUG
+
+      # Ready to rumble lets'encrypt with DNSAPI
+      # - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
+      # - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=ovh"
+      # #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_MAIL:?}"
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+      # Ready to rumble lets'encrypt with challenge
+      # - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_MAIL:?}"
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    mem_limit: 2G
+    cpus: 0.75
+    # Ready to rumble lets'encrypt with DNSAPI    
+    # environment:
+    #   - "OVH_ENDPOINT=${OVH_ENDPOINT:?}"
+    #   - "OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY:?}"
+    #   - "OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET:?}"
+    #   - "OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY:?}"
     ports:
       # The HTTP port
       - "80:80"
       # The HTTPS port
-      - "443:443"
+      - "443:443/tcp"
+      - "443:443/udp"
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
+    healthcheck:
+      test: 
+        - CMD
+        - traefik
+        - healthcheck
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
     networks:
       - traefik
 

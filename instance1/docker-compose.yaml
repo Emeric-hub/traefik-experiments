@@ -4,8 +4,17 @@ services:
     # A container that exposes an API to show its IP address
     image: traefik/whoami
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)"
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)
+      # Add TLS
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=true
+    networks:
+      - traefik
+
+  nginx:
+    image: nginx
+    labels:
+      - "traefik.enable=false"
     networks:
       - traefik
 
@@ -13,8 +22,9 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)"
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.tls=true
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}

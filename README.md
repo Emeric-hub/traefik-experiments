@@ -10,9 +10,9 @@ and start tow separate projects
 
 each one is routed based on his project name.
 
-http://instance1.docker.localhost/
+https://instance1.docker.localhost/
 
-http://instance1.docker.localhost/pgadmin  
+https://instance1.docker.localhost/pgadmin  
 
 http://instance2.docker.localhost/
 
