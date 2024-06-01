@@ -12,6 +12,8 @@ each one is routed based on his project name.
 
 http://instance1.docker.localhost/
 
+http://instance1.docker.localhost/pgadmin  
+
 http://instance2.docker.localhost/
 
 Dashboard is available here :

@@ -9,6 +9,25 @@ services:
     networks:
       - traefik
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)"
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      SCRIPT_NAME: ${PGADMIN_PATH:-/pgadmin}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - traefik
+volumes:
+
+  pgadmin-data:
+
 networks:
   traefik:
     external: true
