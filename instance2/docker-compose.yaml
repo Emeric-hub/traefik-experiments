@@ -1,0 +1,14 @@
+
+services:
+  ingress2:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)"
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
