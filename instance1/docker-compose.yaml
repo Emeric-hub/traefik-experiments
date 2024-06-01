@@ -11,13 +11,6 @@ services:
     networks:
       - traefik
 
-  nginx:
-    image: nginx
-    labels:
-      - "traefik.enable=false"
-    networks:
-      - traefik
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
@@ -25,6 +18,12 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.tls=true
+      #adding error handling
+      - traefik.http.middlewares.error-handling.errors.status=500,502,503,504
+      - traefik.http.middlewares.error-handling.errors.service=default-nginx-proxy
+      - traefik.http.middlewares.error-handling.errors.query=/50x.html
+
+
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}

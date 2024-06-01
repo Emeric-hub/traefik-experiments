@@ -28,3 +28,6 @@ http://127.0.0.1:8080/dashboard#/http/services
 
 - Crodwsec (plugins available !!! )
 
+# Nice sources
+
+https://github.com/56kcloud/traefik-training/
