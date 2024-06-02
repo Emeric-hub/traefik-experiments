@@ -4,25 +4,52 @@ services:
     # A container that exposes an API to show its IP address
     image: traefik/whoami
     labels:
+
+      # Activate Traefik Handling by Proxy
       - traefik.enable=true
+
+      # ROUTER - HTTPS
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)
-      # Add TLS
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=${COMPOSE_PROJECT_NAME}-redirect,${COMPOSE_PROJECT_NAME}-error-handling
+
+      # ROUTER - HTTPS
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.rule=Host(`${BASE_URL}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.middlewares=${COMPOSE_PROJECT_NAME}-redirect,${COMPOSE_PROJECT_NAME}-error-handling
+
+      # MW - Redirect Scheme HTTP -> HTTPS
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}.redirectscheme.permanent=true"
+
+      # MW - adding error handling
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.status=500,502,503,504
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.service=default-nginx-proxy@docker
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.query=/50x.html
+
     networks:
       - traefik
 
+# PGAdmin with redirect http to https and error handling
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.tls=true
-      #adding error handling
-      - traefik.http.middlewares.error-handling.errors.status=500,502,503,504
-      - traefik.http.middlewares.error-handling.errors.service=default-nginx-proxy
-      - traefik.http.middlewares.error-handling.errors.query=/50x.html
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.middlewares=${COMPOSE_PROJECT_NAME}-pgadmin-redirect,${COMPOSE_PROJECT_NAME}-pgadmin-error-handling
 
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin-ssl.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin-ssl.rule=Host(`${BASE_URL}`)&&PathPrefix(`${PGADMIN_PATH:-/pgadmin}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin-ssl.middlewares=${COMPOSE_PROJECT_NAME}-pgadmin-error-handling
+
+      # Redirect Scheme HTTP -> HTTPS
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin.redirectscheme.permanent=true"
+
+      # adding error handling
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-error-handling.errors.status=500,502,503,504
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-error-handling.errors.service=default-nginx-proxy@docker
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-error-handling.errors.query=/50x.html
 
     restart: always
     environment:
