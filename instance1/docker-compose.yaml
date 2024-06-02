@@ -18,13 +18,19 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.middlewares=${COMPOSE_PROJECT_NAME}-redirect,${COMPOSE_PROJECT_NAME}-error-handling
 
       # MW - Redirect Scheme HTTP -> HTTPS
-      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}.redirectscheme.permanent=true"
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}.redirectscheme.permanent=true
 
       # MW - adding error handling
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.status=500,502,503,504
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.service=default-nginx-proxy@docker
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.query=/50x.html
+
+      # HEALTHCheck - TODO
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.healthcheck.path=/healthcheck
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.healthcheck.interval=100ms
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.healthcheck.timeout=75ms
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.healthcheck.scheme=http
 
     networks:
       - traefik
@@ -43,8 +49,8 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin-ssl.middlewares=${COMPOSE_PROJECT_NAME}-pgadmin-error-handling
 
       # Redirect Scheme HTTP -> HTTPS
-      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin.redirectscheme.permanent=true"
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin.redirectscheme.permanent=true
 
       # adding error handling
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pgadmin-error-handling.errors.status=500,502,503,504
