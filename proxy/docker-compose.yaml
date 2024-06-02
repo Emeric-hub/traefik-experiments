@@ -15,7 +15,7 @@ services:
       - --entrypoints.websecure.http3=true
       - --serverstransport.insecureskipverify=true 
       - --accesslog=true
-      - --log.level=DEBUG
+      #- --log.level=DEBUG
 
       # Ready to rumble lets'encrypt with DNSAPI
       # - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
