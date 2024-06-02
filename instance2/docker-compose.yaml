@@ -3,6 +3,7 @@ services:
   ingress2:
     # A container that exposes an API to show its IP address
     image: traefik/whoami
+    restart: always
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)"

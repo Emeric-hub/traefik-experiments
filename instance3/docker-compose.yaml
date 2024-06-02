@@ -1,0 +1,42 @@
+
+services:
+  ingress3:
+    # A container that exposes an API to show its IP address
+    image: caddy
+    restart: always
+    labels:
+
+      # Activate Traefik Handling by Proxy
+      - traefik.enable=true
+
+      # ROUTER - HTTP
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=${COMPOSE_PROJECT_NAME}-redirect,${COMPOSE_PROJECT_NAME}-error-handling
+
+      # ROUTER - HTTPS
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.rule=Host(`${BASE_URL}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-ssl.middlewares=${COMPOSE_PROJECT_NAME}-error-handling
+
+      # MW - Redirect Scheme HTTP -> HTTPS
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}.redirectscheme.permanent=true
+
+      # MW - adding error handling
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.status=500,502,503,504
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.service=default-nginx-proxy@docker
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-error-handling.errors.query=/50x.html
+
+      # Services
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-ssl.loadbalancer.server.port=443
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-ssl.loadbalancer.server.scheme=https
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./static:/usr/share/caddy
+      - ./ssl:/ssl
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
