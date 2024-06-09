@@ -1,0 +1,17 @@
+services:
+  
+  config-provider:
+    # A container that exposes an API to show its IP address
+    image: dunglas/frankenphp
+    # build:
+    #   context: config-provider
+    #   dockerfile: Dockerfile
+    # depends_on:
+    #   - db
+    environment:
+      SERVER_NAME: config-provider
+      CADDY_SERVER_EXTRA_DIRECTIVES: "tls internal"
+    volumes:
+      - ./config-provider/scripts:/app/public
+    networks:
+      - traefik

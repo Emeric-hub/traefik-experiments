@@ -6,7 +6,18 @@ services:
     image: traefik:v3.0
     # Enables the web UI and tells Traefik to listen to docker
     command: 
-      - --configfile=/config/traefik.yml
+      # V0 with only label configuration 
+      - --api.insecure=true
+      - --api.debug=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http3=true
+      - --serverstransport.insecureskipverify=true 
+      - --accesslog=true
+      #- --log.level=DEBUG
+      # END of V0
 
       # Ready to rumble lets'encrypt with DNSAPI
       # - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
@@ -20,7 +31,6 @@ services:
       # #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       # - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_MAIL:?}"
       # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-
     restart: always
     security_opt:
       - no-new-privileges:true
@@ -69,7 +79,7 @@ services:
     depends_on:
       - proxy
     volumes:
-      - ./nginx/static:/usr/share/nginx/html:ro
+      - ./nginx/static:/usr/share/nginx/html
     networks:
       - traefik
 

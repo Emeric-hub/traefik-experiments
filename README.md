@@ -16,9 +16,13 @@ https://instance1.docker.localhost/pgadmin
 
 http://instance2.docker.localhost/
 
+https://instance6.docker.localhost/ -> instance1
+
 Dashboard is available here :
 
-http://127.0.0.1:8080/dashboard#/http/services
+https://127.0.0.1:8080/dashboard#/http/services
+
+/!\ No auth and restriction on ips /!\
 
 ## TODO :
 
@@ -32,6 +36,7 @@ https://traefik.io/blog/traefik-3-deep-dive-into-wasm-support-with-coraza-waf-pl
 
 https://github.com/56kcloud/traefik-training/
 
+https://www.benjaminrancourt.ca/a-complete-traefik-configuration/
 
 # Testing http3 :
 
