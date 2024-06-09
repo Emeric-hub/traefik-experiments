@@ -1,0 +1,10 @@
+---
+http:
+  routers:
+    # adding dashboards
+    dashboard:
+      rule: "Host(`127.0.0.1`) && ( PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
+      service: api@internal
+      tls: true
+      # middlewares:
+      #   - dashboard-auth

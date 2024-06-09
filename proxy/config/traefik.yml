@@ -49,6 +49,7 @@ providers:
     watch: true                               # Watch Docker Swarm events
   file:
     filename: "/config/config.yml"       # Link to the dynamic configuration
+    directory: "/config/configs"
     watch: true                               # Watch for modifications
   providersThrottleDuration: 10               # Configuration reload frequency
   http:

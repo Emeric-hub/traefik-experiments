@@ -9,6 +9,7 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${BASE_URL}`)"
       # IP restriction 
       - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}.ipwhitelist.sourcerange=${IP_WHITELIST}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls=true"
     networks:
       - traefik
 

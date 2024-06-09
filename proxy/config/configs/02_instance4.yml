@@ -1,0 +1,36 @@
+---
+http:
+  routers:
+    instance4:
+      rule: Host(`instance4.docker.localhost`)
+      middlewares: instance4-redirect,instance4-error-handling
+      service: instance4
+
+    instance4-ssl:
+      rule: Host(`instance4.docker.localhost`)
+      tls: true
+      middlewares: instance4-redirect,instance4-error-handling
+      service: instance4
+
+  middlewares:
+    instance4-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    instance4-error-handling:
+      errors:
+        status: 500,502,503,504
+        service: default-nginx-proxy@docker
+        query: /{status}.html
+
+  services:
+    instance4:
+      loadBalancer:
+        servers:
+          - url: "https://www.google.fr"
+        healthCheck:
+          path: /
+          interval: 100ms
+          timeout: 75ms
+          scheme: https
